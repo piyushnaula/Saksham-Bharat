@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Games for Kids</title>
+    <style>
+        body {
+            font-family: Arial, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+        .welcome-title {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            margin: 40px 0 30px 0;
+            font-weight: bold;
+        }
+        .game-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 0 40px 40px 40px;
+        }
+        .upcoming-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 0 40px 40px 40px;
+        }
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 3px solid transparent;
+            position: relative;
+        }
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .upcoming-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 3px dashed #6c757d;
+            cursor: not-allowed;
+            position: relative;
+            opacity: 0.8;
+        }
+        .upcoming-card:hover {
+            transform: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .coming-soon-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .reading-card {
+            border-color: #4CAF50;
+            background: linear-gradient(135deg, #E8F5E8, #ffffff);
+        }
+        .memory-card {
+            border-color: #9C27B0;
+            background: linear-gradient(135deg, #F3E5F5, #ffffff);
+        }
+        .math-card {
+            border-color: #FF9800;
+            background: linear-gradient(135deg, #FFF3E0, #ffffff);
+        }
+        .game-card-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .game-card-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .game-card-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .game-card-description {
+            font-size: 1rem;
+            color: #777;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+        }
+        .btn-disabled {
+            background: linear-gradient(135deg, #adb5bd, #868e96);
+            color: white;
+            cursor: not-allowed;
+        }
+        .upcoming-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px 0;
+        }
+        @media (max-width: 768px) {
+            .app-title { font-size: 2rem; }
+            .welcome-title { font-size: 2rem; }
+            .section-title { font-size: 1.5rem; }
+            .game-cards, .upcoming-cards { 
+                grid-template-columns: 1fr; 
+                padding: 0 20px 20px 20px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">🌟 Learning Games for Kids 🌟</h1>
+        </header>
+
+        <div class="welcome-section">
+            <h2 class="welcome-title">Welcome to Learning Adventures!</h2>
+            <p class="welcome-subtitle">Choose a fun game to start learning</p>
+        </div>
+        
+        <!-- Available Games Section -->
+        <h2 class="section-title">🎮 Play Now</h2>
+        <div class="game-cards">
+            <div class="game-card reading-card" onclick="goToGame('reading-game.html')">
+                <div class="game-card-icon">📚</div>
+                <h3 class="game-card-title">Reading Game</h3>
+                <h4 class="game-card-subtitle">Letter-Sound Match</h4>
+                <p class="game-card-description">Match letters with their sounds and pictures</p>
+                <button class="btn btn-primary game-card-button">Play Now</button>
+            </div>
+            
+            <div class="game-card memory-card" onclick="goToGame('memory-game.html')">
+                <div class="game-card-icon">🧠</div>
+                <h3 class="game-card-title">Memory Game</h3>
+                <h4 class="game-card-subtitle">Picture Matching</h4>
+                <p class="game-card-description">Find matching pairs to improve your memory</p>
+                <button class="btn btn-primary game-card-button">Play Now</button>
+            </div>
+            
+            <div class="game-card math-card" onclick="goToGame('math-game.html')">
+                <div class="game-card-icon">🔢</div>
+                <h3 class="game-card-title">Math Game</h3>
+                <h4 class="game-card-subtitle">Count the Objects</h4>
+                <p class="game-card-description">Count colorful objects and choose the right number</p>
+                <button class="btn btn-primary game-card-button">Play Now</button>
+            </div>
+        </div>
+
+        <!-- Upcoming Games Section -->
+        <div class="upcoming-section">
+            <h2 class="section-title">🚀 Coming Soon</h2>
+            <div class="upcoming-cards">
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">📖</div>
+                    <h3 class="game-card-title">Story Builder</h3>
+                    <h4 class="game-card-subtitle">Create Your Story</h4>
+                    <p class="game-card-description">Build stories with pictures and simple words</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🔶</div>
+                    <h3 class="game-card-title">Shape Explorer</h3>
+                    <h4 class="game-card-subtitle">Learn Shapes</h4>
+                    <p class="game-card-description">Identify circles, squares, triangles and more</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🌈</div>
+                    <h3 class="game-card-title">Color Master</h3>
+                    <h4 class="game-card-subtitle">Color Recognition</h4>
+                    <p class="game-card-description">Learn colors through fun activities</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">➕</div>
+                    <h3 class="game-card-title">Number Fun</h3>
+                    <h4 class="game-card-subtitle">Simple Addition</h4>
+                    <p class="game-card-description">Learn to add numbers with visual help</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🧩</div>
+                    <h3 class="game-card-title">Puzzle Time</h3>
+                    <h4 class="game-card-subtitle">Simple Puzzles</h4>
+                    <p class="game-card-description">Solve easy puzzles to build problem-solving skills</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🎵</div>
+                    <h3 class="game-card-title">Music & Rhythm</h3>
+                    <h4 class="game-card-subtitle">Sound Patterns</h4>
+                    <p class="game-card-description">Learn through music and rhythm activities</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🏠</div>
+                    <h3 class="game-card-title">Daily Life Skills</h3>
+                    <h4 class="game-card-subtitle">Life Activities</h4>
+                    <p class="game-card-description">Learn everyday activities and routines</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">👥</div>
+                    <h3 class="game-card-title">Social Skills</h3>
+                    <h4 class="game-card-subtitle">Friendship & Feelings</h4>
+                    <p class="game-card-description">Learn about emotions and social interactions</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+                
+                <div class="upcoming-card">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="game-card-icon">🌱</div>
+                    <h3 class="game-card-title">Growth Garden</h3>
+                    <h4 class="game-card-subtitle">Progress Tracker</h4>
+                    <p class="game-card-description">Watch your learning tree grow with each achievement</p>
+                    <button class="btn btn-disabled">Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToGame(gameUrl) {
+            window.location.href = gameUrl;
+        }
+        
+        // Add some interactive feedback for upcoming games
+        document.querySelectorAll('.upcoming-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.game-card-title').textContent;
+                alert(`🚀 ${title} is coming soon! Stay tuned for more exciting learning adventures!`);
+            });
+        });
+    </script>
+</body>
+</html>

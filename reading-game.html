@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reading Game - Letter Sound Match</title>
+  <style>
+    body {
+      font-family: Arial, Verdana, sans-serif;
+      background: #f8faff;
+      margin: 0;
+      padding: 0;
+    }
+    .app-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px #0001;
+      padding: 24px;
+      min-height: 92vh;
+      display:flex; flex-direction:column;
+    }
+    .app-header { display: flex; align-items: center; gap: 10px; }
+    .back-button { font-size: 1.1rem; cursor: pointer; background: #e3e8ee; border-radius: 10px; border:none; padding: 8px 18px;}
+    .game-title { font-size: 2rem; font-weight: bold; flex:1; text-align: center;}
+    .score-display { font-size: 1rem; color: #444;}
+    .instruction { padding: 12px 0; font-size: 1.2rem; text-align: center; color: #268;}
+    .letter-display { text-align:center; font-size: 6rem; color: #28a745; margin:1.2rem 0;}
+    .center-row { width:100%; display: flex; flex-direction: column; align-items: center;}
+    .audio-button { background: linear-gradient(135deg, #FF9800, #F57C00); color: white; font-size: 1.3rem; border:none; border-radius:2rem; padding:16px 42px; cursor:pointer; margin:0 auto; display:block;}
+    .answer-options { display: flex; justify-content:center; gap:28px; margin: 38px 0 18px 0; }
+    .option-container { display: flex; flex-direction: column; align-items: center; cursor: pointer; background: #e3f5e2; padding: 18px 14px; border-radius:12px; min-width: 80px; transition:.1s; }
+    .option-container:hover { background: #d7ffd7; }
+    .option-emoji { font-size: 3rem; }
+    .emoji-text { font-size: 1.2rem; color: #333; font-weight: 500; margin-top: 6px;}
+    .feedback { text-align: center; font-size: 1.2rem; margin: 13px 0;}
+    .feedback.success { color: #13bb2b; }
+    .feedback.error { color: #ca2525; }
+    .next-button { background: #2684ff; color: white; border:none; border-radius:22px; font-size:1.15rem; padding:11px 30px; cursor:pointer; display:block; margin:20px auto 0 auto; }
+    #final-score { text-align: center; font-size:1.24rem; margin: 30px 10px 10px 10px; color:#25ac1b;}
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <button class="back-button" onclick="goHome()">← Back to Games</button>
+      <h1 class="game-title">📚 Reading Game</h1>
+      <div class="score-display">Score: <span id="score">0</span></div>
+    </header>
+    <div class="instruction">Click the picture that starts with the letter sound!</div>
+    <div class="center-row">
+      <div class="letter-display" id="current-letter">A</div>
+      <button class="audio-button" onclick="playLetterSound()">🔊 Play Sound</button>
+    </div>
+    <div class="answer-options" id="answer-options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div id="final-score"></div>
+    <button class="next-button" id="next-button" onclick="nextLetter()" style="display: none;">
+      Next Letter →
+    </button>
+  </div>
+  <script>
+    // --- Game Data ---
+    const letterData = {
+      A: { correct: "🍎", name: "Apple", wrong: ["🐱", "🐶"], wrongNames: ["Cat", "Dog"] },
+      B: { correct: "⚽", name: "Ball", wrong: ["🍎", "🐟"], wrongNames: ["Apple", "Fish"] },
+      C: { correct: "🐱", name: "Cat", wrong: ["🐶", "🍎"], wrongNames: ["Dog", "Apple"] },
+      D: { correct: "🐶", name: "Dog", wrong: ["🐱", "⚽"], wrongNames: ["Cat", "Ball"] },
+      E: { correct: "🥚", name: "Egg", wrong: ["🍎", "🐟"], wrongNames: ["Apple", "Fish"] },
+      F: { correct: "🐟", name: "Fish", wrong: ["⚽", "🐱"], wrongNames: ["Ball", "Cat"] },
+      G: { correct: "🍇", name: "Grapes", wrong: ["🍎", "🐶"], wrongNames: ["Apple", "Dog"] },
+      H: { correct: "🏠", name: "House", wrong: ["🐱", "⚽"], wrongNames: ["Cat", "Ball"] },
+      I: { correct: "🍦", name: "Ice cream", wrong: ["🍎", "🐟"], wrongNames: ["Apple", "Fish"] },
+      J: { correct: "🧃", name: "Juice", wrong: ["🐶", "⚽"], wrongNames: ["Dog", "Ball"] },
+      K: { correct: "🔑", name: "Key", wrong: ["🍎", "🐱"], wrongNames: ["Apple", "Cat"] },
+      L: { correct: "🦁", name: "Lion", wrong: ["🐶", "⚽"], wrongNames: ["Dog", "Ball"] },
+      M: { correct: "🐭", name: "Mouse", wrong: ["🍎", "🐟"], wrongNames: ["Apple", "Fish"] },
+      N: { correct: "🥜", name: "Nut", wrong: ["🐱", "⚽"], wrongNames: ["Cat", "Ball"] },
+      O: { correct: "🐙", name: "Octopus", wrong: ["🍎", "🐶"], wrongNames: ["Apple", "Dog"] },
+      P: { correct: "🍕", name: "Pizza", wrong: ["🐱", "🐟"], wrongNames: ["Cat", "Fish"] },
+      Q: { correct: "👸", name: "Queen", wrong: ["🐶", "⚽"], wrongNames: ["Dog", "Ball"] },
+      R: { correct: "🌹", name: "Rose", wrong: ["🍎", "🐱"], wrongNames: ["Apple", "Cat"] },
+      S: { correct: "🌞", name: "Sun", wrong: ["🐶", "🐟"], wrongNames: ["Dog", "Fish"] },
+      T: { correct: "🐅", name: "Tiger", wrong: ["🍎", "⚽"], wrongNames: ["Apple", "Ball"] },
+      U: { correct: "☂️", name: "Umbrella", wrong: ["🐱", "🐶"], wrongNames: ["Cat", "Dog"] },
+      V: { correct: "🎻", name: "Violin", wrong: ["🍎", "🐟"], wrongNames: ["Apple", "Fish"] },
+      W: { correct: "🐋", name: "Whale", wrong: ["🐱", "⚽"], wrongNames: ["Cat", "Ball"] },
+      X: { correct: "🎄", name: "Xmas tree", wrong: ["🍎", "🐶"], wrongNames: ["Apple", "Dog"] },
+      Y: { correct: "🧶", name: "Yarn", wrong: ["🐱", "🐟"], wrongNames: ["Cat", "Fish"] },
+      Z: { correct: "🦓", name: "Zebra", wrong: ["🍎", "🐶"], wrongNames: ["Apple", "Dog"] },
+    };
+
+    const letters = Object.keys(letterData);
+    let currentLetterIndex = 0;
+    let score = 0;
+    let currentCorrectAnswer = null;
+
+    function initializeGame() {
+      currentLetterIndex = 0;
+      score = 0;
+      document.getElementById('final-score').textContent = '';
+      document.getElementById('score').textContent = score;
+      loadLetter();
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('next-button').style.display = 'none';
+    }
+
+    function loadLetter() {
+      if(currentLetterIndex >= letters.length) {
+        showFinalScore();
+        return;
+      }
+      const letter = letters[currentLetterIndex];
+      const data = letterData[letter];
+
+      document.getElementById('current-letter').textContent = letter;
+
+      // Shuffle options
+      const options = [
+        {emoji: data.correct, text: data.name, correct: true},
+        {emoji: data.wrong[0], text: data.wrongNames[0], correct: false},
+        {emoji: data.wrong[1], text: data.wrongNames[1], correct: false}
+      ];
+      options.sort(() => Math.random() - 0.5);
+
+      currentCorrectAnswer = options.findIndex(x => x.correct);
+
+      const container = document.getElementById('answer-options');
+      container.innerHTML = '';
+
+      options.forEach((opt, idx) => {
+        const div = document.createElement('div');
+        div.className = 'option-container';
+        div.onclick = ()=>selectAnswer(idx);
+        div.id = 'option-'+idx;
+        div.innerHTML = `<span class="option-emoji">${opt.emoji}</span>
+                         <span class="emoji-text">${opt.text}</span>`;
+        container.appendChild(div);
+      });
+
+      enableOptions(true);
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('next-button').style.display = 'none';
+
+      setTimeout(playLetterSound, 800);
+    }
+
+    function playLetterSound() {
+      const letter = letters[currentLetterIndex];
+      if ('speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utter1 = new SpeechSynthesisUtterance(letter);
+        utter1.rate = 0.4;
+        utter1.pitch = 1.35;
+        synth.speak(utter1);
+      }
+    }
+
+    function say(text) {
+      if ('speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.8;
+        synth.speak(utter);
+      }
+    }
+
+    function selectAnswer(selectedIndex) {
+      const container = document.getElementById('answer-options');
+      const feedback = document.getElementById('feedback');
+
+      if(selectedIndex === currentCorrectAnswer) {
+        highlightOption(selectedIndex, true);
+        feedback.textContent = '🎉 Excellent! Well done! 🎉';
+        feedback.className = 'feedback success';
+        say('Well done!');
+        score += 10;
+        document.getElementById('score').textContent = score;
+        enableOptions(false);
+        document.getElementById('next-button').style.display = 'block';
+      } else {
+        highlightOption(selectedIndex, false);
+        feedback.textContent = '❌ Try again! Choose the correct one.';
+        feedback.className = 'feedback error';
+        score -= 5;
+        document.getElementById('score').textContent = score;
+        say('Try again!');
+        // Only disable the wrong one, leave others clickable:
+        document.getElementById('option-'+selectedIndex).onclick = null;
+        document.getElementById('option-'+selectedIndex).style.opacity = '0.4';
+      }
+    }
+
+    function highlightOption(idx, isCorrect) {
+      const el = document.getElementById('option-'+idx);
+      if(el) el.style.background = isCorrect ? '#4CAF50' : '#f44336';
+    }
+
+    function enableOptions(enable) {
+      const container = document.getElementById('answer-options');
+      for (let i = 0; i < container.children.length; i++) {
+        container.children[i].style.pointerEvents = enable ? 'auto' : 'none';
+        container.children[i].style.opacity = '1';
+        container.children[i].onclick = enable ? ()=>selectAnswer(i) : null;
+      }
+    }
+
+    function nextLetter() {
+      currentLetterIndex++;
+      loadLetter();
+      document.getElementById('feedback').textContent = '';
+    }
+
+    function showFinalScore() {
+      document.getElementById('answer-options').innerHTML = '';
+      document.getElementById('current-letter').textContent = '';
+      document.getElementById('next-button').style.display = 'none';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('final-score').textContent =
+        `🎊 Game Over! Your Total Score: ${score} 🎊`;
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    window.onload = initializeGame;
+  </script>
+</body>
+</html>
