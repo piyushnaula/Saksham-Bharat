@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Games for Kids</title>
+    <title>ADHD Learning Games for Kids</title>
     <style>
         body {
             font-family: Arial, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
             min-height: 100vh;
             padding: 20px;
             margin: 0;
@@ -21,7 +21,7 @@
             overflow: hidden;
         }
         .app-header {
-            background: linear-gradient(135deg, #4CAF50, #9fe0a2);
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
             color: white;
             padding: 30px;
             text-align: center;
@@ -34,7 +34,7 @@
         .welcome-section {
             text-align: center;
             padding: 40px 20px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, #FFE66D 0%, #FF6B6B 100%);
         }
         .welcome-title {
             font-size: 2.5rem;
@@ -101,17 +101,17 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
-        .reading-card {
-            border-color: #4CAF50;
-            background: linear-gradient(135deg, #E8F5E8, #ffffff);
+        .focus-card {
+            border-color: #FF6B6B;
+            background: linear-gradient(135deg, #FFE5E5, #ffffff);
         }
-        .memory-card {
-            border-color: #9C27B0;
-            background: linear-gradient(135deg, #F3E5F5, #ffffff);
+        .simon-card {
+            border-color: #4ECDC4;
+            background: linear-gradient(135deg, #E5F9F6, #ffffff);
         }
-        .math-card {
-            border-color: #FF9800;
-            background: linear-gradient(135deg, #FFF3E0, #ffffff);
+        .quick-math-card {
+            border-color: #FFE66D;
+            background: linear-gradient(135deg, #FFFACD, #ffffff);
         }
         .game-card-icon {
             font-size: 4rem;
@@ -143,11 +143,11 @@
             font-weight: bold;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
             color: white;
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, #45a049, #4CAF50);
+            background: linear-gradient(135deg, #FF8E53, #FF6B6B);
             transform: translateY(-2px);
         }
         .btn-disabled {
@@ -158,6 +158,23 @@
         .upcoming-section {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             padding: 20px 0;
+        }
+        .back-home {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .back-home:hover {
+            background: white;
+            color: #FF6B6B;
         }
         @media (max-width: 768px) {
             .app-title { font-size: 2rem; }
@@ -173,38 +190,39 @@
 <body>
     <div class="app-container">
         <header class="app-header">
-            <h1 class="app-title">🌟 Learning Games for Kids 🌟</h1>
+            <a href="../index.html" class="back-home">← Main Games</a>
+            <h1 class="app-title">🎯 ADHD Learning Games 🎯</h1>
         </header>
 
         <div class="welcome-section">
-            <h2 class="welcome-title">Welcome to Learning Adventures!</h2>
-            <p class="welcome-subtitle">Choose a fun game to start learning</p>
+            <h2 class="welcome-title">Focus & Fun Adventures!</h2>
+            <p class="welcome-subtitle">Quick games designed for active minds</p>
         </div>
         
         <!-- Available Games Section -->
         <h2 class="section-title">🎮 Play Now</h2>
         <div class="game-cards">
-            <div class="game-card reading-card" onclick="goToGame('reading-game.html')">
-                <div class="game-card-icon">📚</div>
-                <h3 class="game-card-title">Reading Game</h3>
-                <h4 class="game-card-subtitle">Letter-Sound Match</h4>
-                <p class="game-card-description">Match letters with their sounds and pictures</p>
+            <div class="game-card focus-card" onclick="goToGame('adhd-focus-game.html')">
+                <div class="game-card-icon">🎯</div>
+                <h3 class="game-card-title">Focus Challenge</h3>
+                <h4 class="game-card-subtitle">Attention Training</h4>
+                <p class="game-card-description">Quick focus games to improve concentration and attention span</p>
                 <button class="btn btn-primary game-card-button">Play Now</button>
             </div>
             
-            <div class="game-card memory-card" onclick="goToGame('memory-game.html')">
-                <div class="game-card-icon">🧠</div>
-                <h3 class="game-card-title">Memory Game</h3>
-                <h4 class="game-card-subtitle">Picture Matching</h4>
-                <p class="game-card-description">Find matching pairs to improve your memory</p>
+            <div class="game-card simon-card" onclick="goToGame('adhd-simon-game.html')">
+                <div class="game-card-icon">🤖</div>
+                <h3 class="game-card-title">Simon Says Plus</h3>
+                <h4 class="game-card-subtitle">Follow Instructions</h4>
+                <p class="game-card-description">Interactive Simon Says game for impulse control and listening</p>
                 <button class="btn btn-primary game-card-button">Play Now</button>
             </div>
             
-            <div class="game-card math-card" onclick="goToGame('math-game.html')">
-                <div class="game-card-icon">🔢</div>
-                <h3 class="game-card-title">Math Game</h3>
-                <h4 class="game-card-subtitle">Count the Objects</h4>
-                <p class="game-card-description">Count colorful objects and choose the right number</p>
+            <div class="game-card quick-math-card" onclick="goToGame('adhd-quick-math.html')">
+                <div class="game-card-icon">⚡</div>
+                <h3 class="game-card-title">Quick Math</h3>
+                <h4 class="game-card-subtitle">Fast Number Fun</h4>
+                <p class="game-card-description">Fast-paced math games perfect for active learners</p>
                 <button class="btn btn-primary game-card-button">Play Now</button>
             </div>
         </div>
@@ -215,82 +233,55 @@
             <div class="upcoming-cards">
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">📖</div>
-                    <h3 class="game-card-title">Story Builder</h3>
-                    <h4 class="game-card-subtitle">Create Your Story</h4>
-                    <p class="game-card-description">Build stories with pictures and simple words</p>
+                    <div class="game-card-icon">⏰</div>
+                    <h3 class="game-card-title">Time Master</h3>
+                    <h4 class="game-card-subtitle">Time Management</h4>
+                    <p class="game-card-description">Learn to manage time with fun clock activities</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
                 
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">🔶</div>
-                    <h3 class="game-card-title">Shape Explorer</h3>
-                    <h4 class="game-card-subtitle">Learn Shapes</h4>
-                    <p class="game-card-description">Identify circles, squares, triangles and more</p>
+                    <div class="game-card-icon">🏃</div>
+                    <h3 class="game-card-title">Movement Break</h3>
+                    <h4 class="game-card-subtitle">Active Learning</h4>
+                    <p class="game-card-description">Physical activities that help with learning</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
                 
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">🌈</div>
-                    <h3 class="game-card-title">Color Master</h3>
-                    <h4 class="game-card-subtitle">Color Recognition</h4>
-                    <p class="game-card-description">Learn colors through fun activities</p>
+                    <div class="game-card-icon">🧘</div>
+                    <h3 class="game-card-title">Calm Corner</h3>
+                    <h4 class="game-card-subtitle">Self-Regulation</h4>
+                    <p class="game-card-description">Breathing and calming exercises for focus</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
                 
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">➕</div>
-                    <h3 class="game-card-title">Number Fun</h3>
-                    <h4 class="game-card-subtitle">Simple Addition</h4>
-                    <p class="game-card-description">Learn to add numbers with visual help</p>
+                    <div class="game-card-icon">🎨</div>
+                    <h3 class="game-card-title">Creative Express</h3>
+                    <h4 class="game-card-subtitle">Art Therapy</h4>
+                    <p class="game-card-description">Digital art activities for emotional expression</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
                 
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">🧩</div>
-                    <h3 class="game-card-title">Puzzle Time</h3>
-                    <h4 class="game-card-subtitle">Simple Puzzles</h4>
-                    <p class="game-card-description">Solve easy puzzles to build problem-solving skills</p>
+                    <div class="game-card-icon">📝</div>
+                    <h3 class="game-card-title">Task Tracker</h3>
+                    <h4 class="game-card-subtitle">Organization Skills</h4>
+                    <p class="game-card-description">Fun ways to organize and track daily tasks</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
                 
                 <div class="upcoming-card">
                     <div class="coming-soon-badge">Coming Soon</div>
                     <div class="game-card-icon">🎵</div>
-                    <h3 class="game-card-title">Music & Rhythm</h3>
-                    <h4 class="game-card-subtitle">Sound Patterns</h4>
-                    <p class="game-card-description">Learn through music and rhythm activities</p>
-                    <button class="btn btn-disabled">Coming Soon</button>
-                </div>
-                
-                <div class="upcoming-card">
-                    <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">🏠</div>
-                    <h3 class="game-card-title">Daily Life Skills</h3>
-                    <h4 class="game-card-subtitle">Life Activities</h4>
-                    <p class="game-card-description">Learn everyday activities and routines</p>
-                    <button class="btn btn-disabled">Coming Soon</button>
-                </div>
-                
-                <div class="upcoming-card">
-                    <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">👥</div>
-                    <h3 class="game-card-title">Social Skills</h3>
-                    <h4 class="game-card-subtitle">Friendship & Feelings</h4>
-                    <p class="game-card-description">Learn about emotions and social interactions</p>
-                    <button class="btn btn-disabled">Coming Soon</button>
-                </div>
-                
-                <div class="upcoming-card">
-                    <div class="coming-soon-badge">Coming Soon</div>
-                    <div class="game-card-icon">🌱</div>
-                    <h3 class="game-card-title">Growth Garden</h3>
-                    <h4 class="game-card-subtitle">Progress Tracker</h4>
-                    <p class="game-card-description">Watch your learning tree grow with each achievement</p>
+                    <h3 class="game-card-title">Rhythm Focus</h3>
+                    <h4 class="game-card-subtitle">Music & Beat</h4>
+                    <p class="game-card-description">Use music and rhythm to improve focus</p>
                     <button class="btn btn-disabled">Coming Soon</button>
                 </div>
             </div>
@@ -302,11 +293,11 @@
             window.location.href = gameUrl;
         }
         
-        // Add some interactive feedback for upcoming games
+        // Add interactive feedback for upcoming games
         document.querySelectorAll('.upcoming-card').forEach(card => {
             card.addEventListener('click', function() {
                 const title = this.querySelector('.game-card-title').textContent;
-                alert(`🚀 ${title} is coming soon! Stay tuned for more exciting learning adventures!`);
+                alert(`🚀 ${title} is coming soon! These games are specially designed for ADHD learners!`);
             });
         });
     </script>

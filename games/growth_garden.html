@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Garden - Return 0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Comic+Neue:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFE4B5 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: backgroundFloat 15s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(30px, -30px) rotate(2deg); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .title {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(76, 175, 80, 0.3)); }
+            50% { filter: drop-shadow(0 0 20px rgba(33, 150, 243, 0.5)); }
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        .user-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .info-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.8));
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-title {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .info-subtitle {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .total-score .info-value { color: #4CAF50; }
+        .level .info-value { color: #FF9800; }
+        .achievements .info-value { color: #E91E63; }
+
+        .tree-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 40px 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: linear-gradient(180deg, transparent 0%, rgba(76, 175, 80, 0.1) 100%);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .tree {
+            position: relative;
+            width: 250px;
+            height: 400px;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom center;
+        }
+
+        /* Tree growth stages */
+        .tree.stage-1 { transform: scale(0.6); }
+        .tree.stage-2 { transform: scale(0.75); }
+        .tree.stage-3 { transform: scale(0.9); }
+        .tree.stage-4 { transform: scale(1.0); }
+        .tree.stage-5 { transform: scale(1.15); }
+
+        /* Trunk */
+        .trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 15px 15px 8px 8px;
+            box-shadow: inset -3px 0 8px rgba(0, 0, 0, 0.2);
+            transition: all 1s ease-out;
+        }
+
+        .trunk.stage-1 {
+            width: 15px;
+            height: 50px;
+            background: linear-gradient(180deg, #A1887F 0%, #6D4C41 100%);
+        }
+
+        .trunk.stage-2 {
+            width: 18px;
+            height: 70px;
+            background: linear-gradient(180deg, #8D6E63 0%, #5D4037 100%);
+        }
+
+        .trunk.stage-3 {
+            width: 22px;
+            height: 90px;
+            background: linear-gradient(180deg, #8D6E63 0%, #4E342E 100%);
+        }
+
+        .trunk.stage-4 {
+            width: 25px;
+            height: 110px;
+            background: linear-gradient(180deg, #795548 0%, #3E2723 100%);
+        }
+
+        .trunk.stage-5 {
+            width: 30px;
+            height: 130px;
+            background: linear-gradient(180deg, #6D4C41 0%, #2E1A1A 100%);
+        }
+
+        /* Dynamic Branches */
+        .branch {
+            position: absolute;
+            background: linear-gradient(135deg, #8D6E63, #6D4C41);
+            border-radius: 4px;
+            transform-origin: left center;
+            transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .branch.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Dynamic Leaves */
+        .leaf {
+            position: absolute;
+            width: 12px;
+            height: 16px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            border-radius: 0 100% 0 100%;
+            transform-origin: bottom center;
+            animation: leafFloat 4s ease-in-out infinite;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+
+        .leaf.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .leaf::before {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 6px;
+            background: #2E7D32;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        @keyframes leafFloat {
+            0%, 100% { transform: scale(1) rotate(0deg) translateY(0px); }
+            50% { transform: scale(1) rotate(3deg) translateY(-2px); }
+        }
+
+        /* Dynamic Flowers */
+        .flower {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+
+        .flower.visible {
+            opacity: 1;
+            transform: scale(1);
+            animation: flowerBounce 3s ease-in-out infinite;
+        }
+
+        .flower::before {
+            content: '🌸';
+            font-size: 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @keyframes flowerBounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(8deg); }
+        }
+
+        /* Dynamic Fruits */
+        .fruit {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+
+        .fruit.visible {
+            opacity: 1;
+            transform: scale(1);
+            animation: fruitSway 5s ease-in-out infinite;
+        }
+
+        .fruit::before {
+            content: '🍎';
+            font-size: 14px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @keyframes fruitSway {
+            0%, 100% { transform: scale(1) rotate(-3deg); }
+            50% { transform: scale(1) rotate(3deg); }
+        }
+
+        /* Growth level indicator */
+        .growth-level {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            animation: levelPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes levelPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* Manual Input Panel */
+        .input-panel {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(248, 249, 250, 0.6));
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .input-field label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .input-field input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .update-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .update-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+            margin-left: 15px;
+        }
+
+        .reset-btn:hover {
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+        }
+
+        /* Status Messages */
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .status-message.show {
+            transform: translateX(0);
+        }
+
+        .status-message.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3);
+        }
+
+        .status-message.info {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Grass */
+        .grass {
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(90deg, #4CAF50, #66BB6A, #4CAF50);
+            background-size: 20px 100%;
+            animation: grassWave 4s ease-in-out infinite;
+            border-radius: 0 0 20px 20px;
+        }
+
+        @keyframes grassWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .tree-container {
+                height: 400px;
+                margin: 30px 0;
+            }
+            
+            .tree {
+                width: 200px;
+                height: 320px;
+            }
+            
+            .user-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🌳 My Growth Garden 🌳</h1>
+            <p class="subtitle">Watch your tree grow with real learning progress!</p>
+            <div class="demo-notice">
+                📝 Demo Version - Enter your actual learning scores below
+            </div>
+        </div>
+
+        <!-- User Progress Info -->
+        <div class="user-info">
+            <div class="info-card total-score">
+                <div class="info-title">Total Score</div>
+                <div class="info-value" id="total-score">0</div>
+                <div class="info-subtitle">Points Earned</div>
+            </div>
+            <div class="info-card level">
+                <div class="info-title">Growth Level</div>
+                <div class="info-value" id="growth-level">1</div>
+                <div class="info-subtitle">Tree Stage</div>
+            </div>
+            <div class="info-card achievements">
+                <div class="info-title">Achievements</div>
+                <div class="info-value" id="achievement-count">0</div>
+                <div class="info-subtitle">Milestones</div>
+            </div>
+        </div>
+
+        <!-- Dynamic Tree Display -->
+        <div class="tree-container">
+            <div class="grass"></div>
+            <div class="tree stage-1" id="dynamic-tree">
+                <div class="growth-level" id="growth-indicator">Seedling Stage</div>
+                <div class="trunk stage-1" id="dynamic-trunk"></div>
+            </div>
+        </div>
+
+        <!-- Manual Input Panel -->
+        <div class="input-panel">
+            <div class="input-title">📊 Update Your Learning Progress</div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="score-input">Total Learning Score</label>
+                    <input type="number" id="score-input" min="0" max="2000" placeholder="Enter your score" value="0">
+                </div>
+                <div class="input-field">
+                    <label for="achievements-input">Number of Achievements</label>
+                    <input type="number" id="achievements-input" min="0" max="20" placeholder="Achievements earned" value="0">
+                </div>
+            </div>
+            <button class="update-btn" onclick="updateGarden()">
+                🌱 Update Garden
+            </button>
+            <button class="update-btn reset-btn" onclick="resetGarden()">
+                🔄 Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div class="status-message" id="status-message"></div>
+
+    <script>
+        // Real User Data Structure (no fake data generation)
+        let userData = {
+            userId: "demo_user",
+            name: "Student",
+            totalScore: 0,
+            level: 1,
+            achievements: 0,
+            treeData: {
+                stage: 1,
+                leaves: 0,
+                branches: 0,
+                flowers: 0,
+                fruits: 0
+            },
+            lastUpdated: new Date()
+        };
+
+        // Growth stages configuration
+        const growthStages = {
+            1: { name: "Seedling Stage", minScore: 0, maxScore: 100 },
+            2: { name: "Growing Stage", minScore: 101, maxScore: 300 },
+            3: { name: "Developing Stage", minScore: 301, maxScore: 600 },
+            4: { name: "Flourishing Stage", minScore: 601, maxScore: 1000 },
+            5: { name: "Mature Tree", minScore: 1001, maxScore: Infinity }
+        };
+
+        // Branch positions for different stages
+        const branchPositions = {
+            1: [],
+            2: [
+                { width: 30, height: 4, bottom: 40, left: 65, angle: -20 }
+            ],
+            3: [
+                { width: 35, height: 5, bottom: 50, left: 70, angle: -25 },
+                { width: 30, height: 4, bottom: 70, right: 70, angle: 25 }
+            ],
+            4: [
+                { width: 40, height: 6, bottom: 60, left: 75, angle: -30 },
+                { width: 35, height: 5, bottom: 80, right: 75, angle: 30 },
+                { width: 30, height: 4, bottom: 100, left: 70, angle: -20 }
+            ],
+            5: [
+                { width: 45, height: 7, bottom: 70, left: 80, angle: -35 },
+                { width: 40, height: 6, bottom: 90, right: 80, angle: 35 },
+                { width: 35, height: 5, bottom: 110, left: 75, angle: -25 },
+                { width: 30, height: 4, bottom: 130, right: 70, angle: 25 }
+            ]
+        };
+
+        // Initialize the garden
+        function initializeGarden() {
+            loadUserData();
+            updateTreeVisualization();
+            updateDisplayMetrics();
+            updateInputFields();
+            
+            showStatusMessage("Growth Garden ready! 🌱", "info");
+        }
+
+        // Update garden based on manual input (NO FAKE DATA)
+        function updateGarden() {
+            const scoreInput = document.getElementById('score-input');
+            const achievementsInput = document.getElementById('achievements-input');
+            
+            // Get real input values
+            const newScore = parseInt(scoreInput.value) || 0;
+            const newAchievements = parseInt(achievementsInput.value) || 0;
+            
+            // Validate input
+            if (newScore < 0 || newScore > 2000) {
+                showStatusMessage("Score must be between 0 and 2000!", "error");
+                return;
+            }
+            
+            if (newAchievements < 0 || newAchievements > 20) {
+                showStatusMessage("Achievements must be between 0 and 20!", "error");
+                return;
+            }
+            
+            // Update with real data only
+            userData.totalScore = newScore;
+            userData.achievements = newAchievements;
+            userData.lastUpdated = new Date();
+            
+            updateTreeVisualization();
+            updateDisplayMetrics();
+            saveUserData();
+            
+            showStatusMessage("Garden updated with your real progress! 🌟", "success");
+        }
+
+        // Update tree visualization based on REAL user data
+        function updateTreeVisualization() {
+            const tree = document.getElementById('dynamic-tree');
+            const trunk = document.getElementById('dynamic-trunk');
+            const indicator = document.getElementById('growth-indicator');
+            
+            // Calculate growth level based on ACTUAL total score
+            const level = calculateGrowthLevel(userData.totalScore);
+            userData.level = level;
+            
+            // Update tree stage
+            tree.className = `tree stage-${level}`;
+            trunk.className = `trunk stage-${level}`;
+            
+            // Update growth indicator
+            indicator.textContent = growthStages[level].name;
+            
+            // Clear existing dynamic elements
+            const existingElements = tree.querySelectorAll('.branch:not(.static), .leaf, .flower, .fruit');
+            existingElements.forEach(el => el.remove());
+            
+            // Add branches based on stage
+            addBranchesForStage(level);
+            
+            // Add leaves, flowers, and fruits based on REAL performance
+            addLeavesBasedOnScore();
+            addFlowersBasedOnAchievements();
+            addFruitsBasedOnLevel();
+            
+            // Update tree data
+            updateTreeData();
+        }
+
+        // Calculate growth level from ACTUAL total score
+        function calculateGrowthLevel(score) {
+            for (let level = 1; level <= 5; level++) {
+                const stage = growthStages[level];
+                if (score >= stage.minScore && score <= stage.maxScore) {
+                    return level;
+                }
+            }
+            return 1;
+        }
+
+        // Add branches for current stage
+        function addBranchesForStage(stage) {
+            const tree = document.getElementById('dynamic-tree');
+            const branches = branchPositions[stage] || [];
+            
+            branches.forEach((branchConfig, index) => {
+                setTimeout(() => {
+                    const branch = document.createElement('div');
+                    branch.className = 'branch';
+                    branch.style.width = branchConfig.width + 'px';
+                    branch.style.height = branchConfig.height + 'px';
+                    branch.style.bottom = branchConfig.bottom + 'px';
+                    
+                    if (branchConfig.left) {
+                        branch.style.left = branchConfig.left + 'px';
+                    } else {
+                        branch.style.right = branchConfig.right + 'px';
+                    }
+                    
+                    branch.style.transform = `rotate(${branchConfig.angle}deg)`;
+                    branch.style.transformOrigin = branchConfig.left ? 'left center' : 'right center';
+                    
+                    tree.appendChild(branch);
+                    
+                    setTimeout(() => {
+                        branch.classList.add('visible');
+                    }, 100);
+                }, index * 300);
+            });
+        }
+
+        // Add leaves based on ACTUAL total score
+        function addLeavesBasedOnScore() {
+            const tree = document.getElementById('dynamic-tree');
+            const leafCount = Math.floor(userData.totalScore / 40); // 1 leaf per 40 points
+            const maxLeaves = userData.level * 6; // Maximum leaves based on level
+            const actualLeaves = Math.min(leafCount, maxLeaves);
+            
+            const leafPositions = generateLeafPositions(actualLeaves, userData.level);
+            
+            leafPositions.forEach((pos, index) => {
+                setTimeout(() => {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'leaf';
+                    leaf.style.bottom = pos.bottom + 'px';
+                    leaf.style.left = pos.left + 'px';
+                    leaf.title = `${userData.totalScore} points earned`;
+                    
+                    tree.appendChild(leaf);
+                    
+                    setTimeout(() => {
+                        leaf.classList.add('visible');
+                    }, 100);
+                }, index * 120);
+            });
+            
+            userData.treeData.leaves = actualLeaves;
+        }
+
+        // Add flowers based on ACTUAL achievements
+        function addFlowersBasedOnAchievements() {
+            const tree = document.getElementById('dynamic-tree');
+            const flowerCount = userData.achievements;
+            
+            if (flowerCount > 0 && userData.level >= 2) {
+                const flowerPositions = generateFlowerPositions(flowerCount, userData.level);
+                
+                flowerPositions.forEach((pos, index) => {
+                    setTimeout(() => {
+                        const flower = document.createElement('div');
+                        flower.className = 'flower';
+                        flower.style.bottom = pos.bottom + 'px';
+                        flower.style.left = pos.left + 'px';
+                        flower.title = `Achievement ${index + 1}`;
+                        
+                        tree.appendChild(flower);
+                        
+                        setTimeout(() => {
+                            flower.classList.add('visible');
+                        }, 100);
+                    }, index * 350);
+                });
+                
+                userData.treeData.flowers = flowerCount;
+            }
+        }
+
+        // Add fruits based on level achievement
+        function addFruitsBasedOnLevel() {
+            const tree = document.getElementById('dynamic-tree');
+            let fruitCount = 0;
+            
+            if (userData.level >= 3) {
+                fruitCount = userData.level >= 5 ? 3 : userData.level >= 4 ? 2 : 1;
+                
+                const fruitPositions = generateFruitPositions(fruitCount, userData.level);
+                
+                fruitPositions.forEach((pos, index) => {
+                    setTimeout(() => {
+                        const fruit = document.createElement('div');
+                        fruit.className = 'fruit';
+                        fruit.style.bottom = pos.bottom + 'px';
+                        fruit.style.left = pos.left + 'px';
+                        fruit.title = `Level ${userData.level} Achievement!`;
+                        
+                        tree.appendChild(fruit);
+                        
+                        setTimeout(() => {
+                            fruit.classList.add('visible');
+                        }, 100);
+                    }, index * 450);
+                });
+                
+                userData.treeData.fruits = fruitCount;
+            }
+        }
+
+        // Generate leaf positions based on tree level
+        function generateLeafPositions(count, level) {
+            const positions = [];
+            const basePositions = [
+                { bottom: 60, left: 80 }, { bottom: 80, left: 90 }, { bottom: 70, left: 60 },
+                { bottom: 90, left: 70 }, { bottom: 100, left: 85 }, { bottom: 85, left: 55 },
+                { bottom: 110, left: 75 }, { bottom: 95, left: 95 }, { bottom: 75, left: 45 },
+                { bottom: 120, left: 65 }, { bottom: 105, left: 100 }, { bottom: 115, left: 50 },
+                { bottom: 130, left: 80 }, { bottom: 125, left: 90 }, { bottom: 135, left: 70 }
+            ];
+            
+            for (let i = 0; i < Math.min(count, basePositions.length); i++) {
+                positions.push({
+                    bottom: basePositions[i].bottom + (level - 1) * 8,
+                    left: basePositions[i].left
+                });
+            }
+            
+            return positions;
+        }
+
+        // Generate flower positions
+        function generateFlowerPositions(count, level) {
+            const positions = [];
+            const basePositions = [
+                { bottom: 85, left: 75 }, { bottom: 105, left: 80 }, { bottom: 95, left: 65 },
+                { bottom: 115, left: 70 }, { bottom: 125, left: 85 }, { bottom: 110, left: 90 }
+            ];
+            
+            for (let i = 0; i < Math.min(count, basePositions.length); i++) {
+                positions.push({
+                    bottom: basePositions[i].bottom + (level - 1) * 10,
+                    left: basePositions[i].left
+                });
+            }
+            
+            return positions;
+        }
+
+        // Generate fruit positions
+        function generateFruitPositions(count, level) {
+            const positions = [];
+            const basePositions = [
+                { bottom: 90, left: 85 }, { bottom: 110, left: 75 }, { bottom: 100, left: 95 }
+            ];
+            
+            for (let i = 0; i < Math.min(count, basePositions.length); i++) {
+                positions.push({
+                    bottom: basePositions[i].bottom + (level - 1) * 12,
+                    left: basePositions[i].left
+                });
+            }
+            
+            return positions;
+        }
+
+        // Update tree data object
+        function updateTreeData() {
+            userData.treeData.stage = userData.level;
+            userData.treeData.branches = branchPositions[userData.level]?.length || 0;
+        }
+
+        // Update display metrics
+        function updateDisplayMetrics() {
+            document.getElementById('total-score').textContent = userData.totalScore;
+            document.getElementById('growth-level').textContent = userData.level;
+            document.getElementById('achievement-count').textContent = userData.achievements;
+        }
+
+        // Update input fields with current data
+        function updateInputFields() {
+            document.getElementById('score-input').value = userData.totalScore;
+            document.getElementById('achievements-input').value = userData.achievements;
+        }
+
+        // Reset garden to initial state
+        function resetGarden() {
+            if (confirm("Are you sure you want to reset your garden?")) {
+                userData = {
+                    userId: "demo_user",
+                    name: "Student",
+                    totalScore: 0,
+                    level: 1,
+                    achievements: 0,
+                    treeData: { stage: 1, leaves: 0, branches: 0, flowers: 0, fruits: 0 },
+                    lastUpdated: new Date()
+                };
+                
+                updateTreeVisualization();
+                updateDisplayMetrics();
+                updateInputFields();
+                saveUserData();
+                
+                showStatusMessage("Garden reset successfully! 🌱", "info");
+            }
+        }
+
+        // Save user data to localStorage
+        function saveUserData() {
+            localStorage.setItem('cleanGrowthData', JSON.stringify(userData));
+        }
+
+        // Load user data from localStorage
+        function loadUserData() {
+            const saved = localStorage.getItem('cleanGrowthData');
+            if (saved) {
+                userData = { ...userData, ...JSON.parse(saved) };
+            }
+        }
+
+        // Show status message
+        function showStatusMessage(message, type = 'success') {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = `status-message ${type}`;
+            statusEl.classList.add('show');
+            
+            setTimeout(() => {
+                statusEl.classList.remove('show');
+            }, 3500);
+        }
+
+        // Initialize garden on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGarden();
+            
+            // Show welcome message
+            setTimeout(() => {
+                showStatusMessage("Enter your real scores to see your tree grow! 📊", "info");
+            }, 1000);
+        });
+
+        // Voice feedback
+        function speakAchievement(message) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.2;
+                speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>

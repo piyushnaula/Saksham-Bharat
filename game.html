@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Start Assessment - Return 0</title>
+    <link rel="stylesheet" href="assessment-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=OpenDyslexic:wght@400;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="assessment-container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcome-screen">
+            <h1>🌟 Smart Start Assessment 🌟</h1>
+            <p class="subtitle">
+                A fun and friendly test to help us understand how you learn best!<br>
+                We'll play some exciting games together.
+            </p>
+            <div style="margin: 30px 0;">
+                <p style="font-size: 1.1rem; color: #666;">
+                    📋 This test includes:<br>
+                    🎯 Focus games • 📝 Letter games • 🧠 Memory games
+                </p>
+            </div>
+            <button class="btn btn-large" onclick="startAssessment()">
+                🚀 Let's Start!
+            </button>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div class="screen" id="instructions-screen">
+            <h2>📋 Instructions</h2>
+            <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">🎮 How to Play:</h3>
+                    <ul style="font-size: 1.1rem; line-height: 1.8;">
+                        <li>✅ Listen carefully to the instructions</li>
+                        <li>✅ Click the 🔊 button to hear sounds again</li>
+                        <li>✅ Take your time - there's no rush!</li>
+                        <li>✅ Try your best and have fun!</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="btn" onclick="startGame1()">
+                🎯 Start First Game
+            </button>
+        </div>
+
+        <!-- Game 1: Focus & Match (Slow Learning Assessment) -->
+        <div class="screen" id="game1-screen">
+            <h2>🎯 Focus Game</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress1"></div>
+            </div>
+            <div class="instruction" id="game1-instruction">
+                Click the 🔊 button to hear what to find!
+            </div>
+            <button class="audio-btn" onclick="playAudio('game1')">🔊 Listen</button>
+            <div class="timer" id="timer1">Time: 0s</div>
+            <div class="game-area">
+                <div class="image-grid" id="image-grid">
+                    <!-- Images will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="feedback" id="feedback1"></div>
+            <button class="btn" id="next-btn1" onclick="startGame2()" style="display: none;">
+                Next Game →
+            </button>
+        </div>
+
+        <!-- Game 2: Letter & Sound (Dyslexia Assessment) -->
+        <div class="screen" id="game2-screen">
+            <h2>📝 Letter Sound Game</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress2"></div>
+            </div>
+            <div class="instruction" id="game2-instruction">
+                Listen to the letter sound and click the matching letter!
+            </div>
+            <button class="audio-btn" onclick="playAudio('game2')">🔊 Play Sound</button>
+            <div class="timer" id="timer2">Time: 0s</div>
+            <div class="game-area">
+                <div class="letter-display" id="letter-display">?</div>
+                <div class="letter-options" id="letter-options">
+                    <!-- Letters will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="feedback" id="feedback2"></div>
+            <button class="btn" id="next-btn2" onclick="startGame3()" style="display: none;">
+                Next Game →
+            </button>
+        </div>
+
+        <!-- Game 3: Memory Game (Cognitive Assessment) -->
+        <div class="screen" id="game3-screen">
+            <h2>🧠 Memory Game</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress3"></div>
+            </div>
+            <div class="instruction">
+                Find matching pairs by clicking on cards. Remember where each picture is!
+            </div>
+            <div class="timer" id="timer3">Time: 0s</div>
+            <div class="score-display">Pairs Found: <span id="pairs-found">0</span>/4</div>
+            <div class="game-area">
+                <div class="memory-grid" id="memory-grid">
+                    <!-- Memory cards will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="feedback" id="feedback3"></div>
+            <button class="btn" id="results-btn" onclick="showResults()" style="display: none;">
+                See Results →
+            </button>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen" id="results-screen">
+            <h2>📊 Assessment Results</h2>
+            <p class="subtitle">Great job completing all the games! Here's what we learned:</p>
+            
+            <div class="results-grid" id="results-grid">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+            
+            <div class="recommendations" id="recommendations">
+                <!-- Recommendations will be populated by JavaScript -->
+            </div>
+            
+            <button class="btn" onclick="restartAssessment()">
+                🔄 Take Test Again
+            </button>
+            <button class="btn" onclick="downloadResults()">
+                📄 Download Report
+            </button>
+        </div>
+    </div>
+
+    <script src="assessment-script.js"></script>
+</body>
+</html>

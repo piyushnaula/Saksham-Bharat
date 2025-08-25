@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quick Math Game</title>
+  <style>
+    body {
+      font-family: Arial, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FFFACD, #FFE66D);
+      margin: 0;
+      padding: 0;
+    }
+    .app-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px #0001;
+      padding: 24px;
+      min-height: 92vh;
+    }
+    .app-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .back-button { font-size: 1.1rem; cursor: pointer; background: #FFFACD; border-radius: 10px; border:none; padding: 8px 18px;}
+    .game-title { font-size: 2rem; font-weight: bold; flex:1; text-align: center; color: #FFD700;}
+    .score-display { font-size: 1rem; color: #444;}
+    .instruction { padding: 12px 0; font-size: 1.2rem; text-align: center; color: #FFD700; margin-bottom: 20px;}
+    .math-problem {
+      background: linear-gradient(135deg, #FFE66D, #FFD700);
+      color: #333;
+      text-align: center;
+      font-size: 3rem;
+      font-weight: bold;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 20px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .answer-options {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+    .answer-button {
+      background: linear-gradient(135deg, #FFE66D, #FFD700);
+      color: #333;
+      border: none;
+      padding: 25px 35px;
+      border-radius: 20px;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      min-width: 100px;
+      border: 3px solid transparent;
+    }
+    .answer-button:hover:not(:disabled) {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      border-color: #FFD700;
+    }
+    .answer-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .timer {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #FFD700;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .streak-indicator {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #FF6B6B;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .feedback { text-align: center; font-size: 1.3rem; margin: 15px 0; font-weight: bold;}
+    .feedback.success { color: #13bb2b; }
+    .feedback.error { color: #ca2525; }
+    .next-button { 
+      background: #FFD700; 
+      color: #333; 
+      border:none; 
+      border-radius:22px; 
+      font-size:1.15rem; 
+      padding:11px 30px; 
+      cursor:pointer; 
+      display:block; 
+      margin:20px auto; 
+      font-weight: bold;
+    }
+    #final-score { text-align: center; font-size:1.4rem; margin: 30px 10px; color:#FFD700;}
+    .round-indicator {
+      text-align: center;
+      font-size: 1rem;
+      color: #666;
+      margin: 10px 0;
+    }
+    .speed-bonus {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #FF6B6B;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <button class="back-button" onclick="goHome()">← Back to Games</button>
+      <h1 class="game-title">⚡ Quick Math</h1>
+      <div class="score-display">Score: <span id="score">0</span></div>
+    </header>
+
+    <div class="instruction">Solve the math problem as fast as you can!</div>
+    <div class="round-indicator">Problem <span id="round">1</span> of 15</div>
+    <div class="streak-indicator" id="streak">Streak: 0 🔥</div>
+    
+    <div class="timer" id="timer">Time: 10s</div>
+    <div class="speed-bonus" id="speed-bonus"></div>
+    
+    <div class="math-problem" id="math-problem">
+      3 + 2 = ?
+    </div>
+    
+    <div class="answer-options" id="answer-options">
+      <button class="answer-button" onclick="selectAnswer(0)">5</button>
+      <button class="answer-button" onclick="selectAnswer(1)">4</button>
+      <button class="answer-button" onclick="selectAnswer(2)">6</button>
+    </div>
+    
+    <div class="feedback" id="feedback"></div>
+    <div id="final-score"></div>
+    
+    <button class="next-button" id="next-button" onclick="nextProblem()" style="display: none;">
+      Next Problem →
+    </button>
+  </div>
+
+  <script>
+    let currentRound = 1;
+    let score = 0;
+    let streak = 0;
+    let timeLeft = 10;
+    let roundTimer = null;
+    let startTime = 0;
+    let currentAnswer = 0;
+    const maxRounds = 15;
+
+    const operations = ['+', '-'];
+    
+    function initializeGame() {
+      currentRound = 1;
+      score = 0;
+      streak = 0;
+      updateDisplay();
+      generateProblem();
+    }
+
+    function generateProblem() {
+      if (currentRound > maxRounds) {
+        showFinalScore();
+        return;
+      }
+
+      clearTimer();
+      timeLeft = 10;
+      startTime = Date.now();
+      
+      // Generate appropriate difficulty based on round
+      let maxNum = Math.min(5 + Math.floor(currentRound / 3), 12);
+      let num1 = Math.floor(Math.random() * maxNum) + 1;
+      let num2 = Math.floor(Math.random() * maxNum) + 1;
+      let operation = operations[Math.floor(Math.random() * operations.length)];
+      
+      // Ensure subtraction doesn't go negative
+      if (operation === '-' && num2 > num1) {
+        [num1, num2] = [num2, num1];
+      }
+      
+      // Calculate correct answer
+      currentAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+      
+      // Display problem
+      document.getElementById('math-problem').textContent = `${num1} ${operation} ${num2} = ?`;
+      
+      // Generate answer options
+      generateAnswerOptions();
+      
+      // Clear feedback and hide next button
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('speed-bonus').textContent = '';
+      document.getElementById('next-button').style.display = 'none';
+      enableButtons(true);
+      
+      // Start timer
+      startTimer();
+      
+      // Read the problem aloud
+      say(`${num1} ${operation === '+' ? 'plus' : 'minus'} ${num2} equals what?`);
+    }
+
+    function generateAnswerOptions() {
+      const container = document.getElementById('answer-options');
+      container.innerHTML = '';
+      
+      // Create 3 options: correct answer + 2 wrong answers
+      const options = [currentAnswer];
+      
+      // Add wrong answers
+      while (options.length < 3) {
+        let wrongAnswer = currentAnswer + (Math.random() > 0.5 ? 
+          Math.floor(Math.random() * 5) + 1 : 
+          -(Math.floor(Math.random() * 5) + 1));
+        
+        if (!options.includes(wrongAnswer) && wrongAnswer >= 0) {
+          options.push(wrongAnswer);
+        }
+      }
+      
+      // Shuffle options
+      options.sort(() => Math.random() - 0.5);
+      
+      // Create buttons
+      options.forEach(number => {
+        const button = document.createElement('button');
+        button.className = 'answer-button';
+        button.textContent = number;
+        button.onclick = () => selectAnswer(number);
+        container.appendChild(button);
+      });
+    }
+
+    function startTimer() {
+      document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+      
+      roundTimer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = `Time: ${timeLeft}s`;
+        
+        if (timeLeft <= 0) {
+          clearTimer();
+          timeUp();
+        }
+      }, 1000);
+    }
+
+    function selectAnswer(selectedNumber) {
+      clearTimer();
+      enableButtons(false);
+      
+      const timeTaken = (Date.now() - startTime) / 1000;
+      const feedback = document.getElementById('feedback');
+      const speedBonus = document.getElementById('speed-bonus');
+      
+      if (selectedNumber === currentAnswer) {
+        // Correct answer
+        let points = 20;
+        streak++;
+        
+        // Speed bonus
+        if (timeTaken < 3) {
+          points += 15;
+          speedBonus.textContent = '🚀 Speed Bonus: +15 points!';
+        } else if (timeTaken < 5) {
+          points += 10;
+          speedBonus.textContent = '⚡ Quick Bonus: +10 points!';
+        } else if (timeTaken < 7) {
+          points += 5;
+          speedBonus.textContent = '👍 Good Speed: +5 points!';
+        }
+        
+        // Streak bonus
+        if (streak >= 5) {
+          points += 10;
+          speedBonus.textContent += ' 🔥 Streak Bonus: +10!';
+        }
+        
+        score += points;
+        feedback.textContent = '🎉 Correct! Great math skills! 🎉';
+        feedback.className = 'feedback success';
+        say('Correct! Great math skills!');
+        
+        // Highlight correct button
+        highlightButton(selectedNumber, true);
+        
+      } else {
+        // Wrong answer
+        streak = 0;
+        score = Math.max(0, score - 5);
+        feedback.textContent = `❌ Not quite! The answer is ${currentAnswer}. ❌`;
+        feedback.className = 'feedback error';
+        say(`Not quite! The answer is ${currentAnswer}`);
+        
+        // Highlight wrong and correct buttons
+        highlightButton(selectedNumber, false);
+        highlightButton(currentAnswer, true);
+      }
+      
+      updateDisplay();
+      setTimeout(() => {
+        document.getElementById('next-button').style.display = 'block';
+      }, 2000);
+    }
+
+    function highlightButton(number, isCorrect) {
+      const buttons = document.querySelectorAll('.answer-button');
+      buttons.forEach(btn => {
+        if (parseInt(btn.textContent) === number) {
+          btn.style.background = isCorrect ? '#4CAF50' : '#f44336';
+          btn.style.color = 'white';
+        }
+      });
+    }
+
+    function timeUp() {
+      enableButtons(false);
+      streak = 0;
+      
+      const feedback = document.getElementById('feedback');
+      feedback.textContent = `⏰ Time up! The answer was ${currentAnswer}. ⏰`;
+      feedback.className = 'feedback error';
+      say(`Time up! The answer was ${currentAnswer}`);
+      
+      // Highlight correct answer
+      highlightButton(currentAnswer, true);
+      
+      setTimeout(() => {
+        document.getElementById('next-button').style.display = 'block';
+      }, 2500);
+    }
+
+    function enableButtons(enable) {
+      const buttons = document.querySelectorAll('.answer-button');
+      buttons.forEach(btn => btn.disabled = !enable);
+    }
+
+    function nextProblem() {
+      currentRound++;
+      updateDisplay();
+      generateProblem();
+    }
+
+    function updateDisplay() {
+      document.getElementById('score').textContent = score;
+      document.getElementById('round').textContent = currentRound;
+      document.getElementById('streak').textContent = `Streak: ${streak} ${streak > 0 ? '🔥' : ''}`;
+    }
+
+    function showFinalScore() {
+      document.getElementById('math-problem').textContent = '';
+      document.getElementById('answer-options').innerHTML = '';
+      document.getElementById('timer').textContent = '';
+      document.getElementById('next-button').style.display = 'none';
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('speed-bonus').textContent = '';
+      
+      const finalScore = document.getElementById('final-score');
+      let message = '';
+      if (score >= 250) {
+        message = '🌟 Math Champion! 🌟';
+      } else if (score >= 200) {
+        message = '🎯 Great Calculator! 🎯';
+      } else if (score >= 150) {
+        message = '👍 Good Math Skills! 👍';
+      } else {
+        message = '📚 Keep Practicing! 📚';
+      }
+      
+      finalScore.textContent = `${message} Final Score: ${score}`;
+      say('Game complete! ' + message);
+    }
+
+    function clearTimer() {
+      if (roundTimer) clearInterval(roundTimer);
+    }
+
+    function say(text) {
+      if ('speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.8;
+        synth.speak(utter);
+      }
+    }
+
+    function goHome() {
+      window.location.href = 'adhd-index.html';
+    }
+
+    window.onload = initializeGame;
+  </script>
+</body>
+</html>

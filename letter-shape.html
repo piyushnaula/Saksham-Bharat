@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Shapes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=OpenDyslexic:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'OpenDyslexic', Arial, sans-serif;
+            background: linear-gradient(135deg, #E8EAF6, #C5CAE9);
+            margin: 0;
+            padding: 20px;
+            font-size: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            color: #3F51B5;
+            margin: 20px 0;
+        }
+        
+        .instruction {
+            font-size: 1.8rem;
+            color: #333;
+            margin: 25px 0;
+            padding: 20px;
+            background: #F8F5FF;
+            border-radius: 15px;
+        }
+        
+        .shape-comparison {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .letter-shape {
+            font-size: 8rem;
+            font-weight: bold;
+            padding: 30px;
+            background: white;
+            border: 5px solid #3F51B5;
+            border-radius: 20px;
+            min-width: 150px;
+        }
+        
+        .vs-text {
+            font-size: 2rem;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .question {
+            font-size: 1.6rem;
+            margin: 30px 0;
+            color: #333;
+        }
+        
+        .answer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .answer-btn {
+            background: white;
+            border: 4px solid #ddd;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'OpenDyslexic', Arial, sans-serif;
+        }
+        
+        .answer-btn:hover {
+            border-color: #3F51B5;
+            background: #F8F5FF;
+        }
+        
+        .answer-btn.correct {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .answer-btn.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .feedback {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 70px;
+        }
+        
+        .feedback.success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .feedback.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .next-btn {
+            background: #3F51B5;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin: 20px;
+        }
+        
+        .back-btn {
+            background: #E8EAF6;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 20px;
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <div class="score">Score: <span id="score">0</span></div>
+        </div>
+        
+        <h1 class="title">🔍 Letter Shapes</h1>
+        
+        <div class="instruction">
+            Look at these letters. Are they the same or different?
+        </div>
+        
+        <div class="shape-comparison">
+            <div class="letter-shape" id="letter1">b</div>
+            <div class="vs-text">VS</div>
+            <div class="letter-shape" id="letter2">d</div>
+        </div>
+        
+        <div class="question">Are these letters the same or different?</div>
+        
+        <div class="answer-buttons">
+            <button class="answer-btn" onclick="answer('same')">Same</button>
+            <button class="answer-btn" onclick="answer('different')">Different</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <button class="next-btn" id="next-btn" onclick="nextRound()" style="display: none;">
+            Next →
+        </button>
+    </div>
+
+    <script>
+        const comparisons = [
+            { letters: ['b', 'd'], answer: 'different' },
+            { letters: ['p', 'q'], answer: 'different' },
+            { letters: ['w', 'm'], answer: 'different' },
+            { letters: ['b', 'b'], answer: 'same' },
+            { letters: ['d', 'd'], answer: 'same' },
+            { letters: ['m', 'm'], answer: 'same' },
+            { letters: ['n', 'u'], answer: 'different' },
+            { letters: ['w', 'w'], answer: 'same' }
+        ];
+
+        let currentRound = 0;
+        let score = 0;
+        let currentAnswer = '';
+
+        function startGame() {
+            currentRound = 0;
+            score = 0;
+            updateScore();
+            loadRound();
+        }
+
+        function loadRound() {
+            if (currentRound >= comparisons.length) {
+                showFinalScore();
+                return;
+            }
+
+            const round = comparisons[currentRound];
+            currentAnswer = round.answer;
+            
+            document.getElementById('letter1').textContent = round.letters[0];
+            document.getElementById('letter2').textContent = round.letters[1];
+            
+            // Reset answer buttons
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.className = 'answer-btn';
+                btn.style.pointerEvents = 'auto';
+            });
+            
+            clearFeedback();
+            document.getElementById('next-btn').style.display = 'none';
+            
+            // Speak the letters
+            setTimeout(() => {
+                speakText(`Look at these letters: ${round.letters[0]} and ${round.letters[1]}. Are they the same or different?`);
+            }, 500);
+        }
+
+        function answer(selectedAnswer) {
+            const allBtns = document.querySelectorAll('.answer-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+            
+            const clickedBtn = event.target;
+            
+            if (selectedAnswer === currentAnswer) {
+                clickedBtn.className = 'answer-btn correct';
+                score += 20;
+                updateScore();
+                showFeedback('✅ Correct! Good eye!', 'success');
+                speakText('Correct! You spotted the difference perfectly.');
+                document.getElementById('next-btn').style.display = 'block';
+            } else {
+                clickedBtn.className = 'answer-btn wrong';
+                showFeedback(`❌ The letters are ${currentAnswer}.`, 'error');
+                speakText(`The letters are ${currentAnswer}. Look carefully at their shapes.`);
+                
+                // Show correct answer
+                allBtns.forEach(b => {
+                    if (b.textContent.toLowerCase() === currentAnswer) {
+                        b.className = 'answer-btn correct';
+                    }
+                });
+                
+                setTimeout(() => {
+                    document.getElementById('next-btn').style.display = 'block';
+                }, 2000);
+            }
+        }
+
+        function nextRound() {
+            currentRound++;
+            loadRound();
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+        }
+
+        function clearFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function showFinalScore() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h1 style="font-size: 3rem; color: #4CAF50;">🎉 Amazing!</h1>
+                    <p style="font-size: 2rem; margin: 30px 0;">Final Score: ${score}</p>
+                    <button onclick="startGame()" style="background: #3F51B5; color: white; border: none; padding: 20px 40px; border-radius: 25px; font-size: 1.4rem; cursor: pointer; margin: 10px;">Play Again</button>
+                    <button onclick="goBack()" style="background: #666; color: white; border: none; padding: 20px 40px; border-radius: 25px; font-size: 1.4rem; cursor: pointer; margin: 10px;">Back to Games</button>
+                </div>
+            `;
+            
+            speakText(`Fantastic! You completed the letter shapes game. Your final score is ${score} points.`);
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.7;
+                utterance.pitch = 1.1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'dyslexia-index.html';
+        }
+
+        window.onload = startGame;
+    </script>
+</body>
+</html>
