@@ -1,0 +1,38 @@
+version: "3.0"
+nlu:
+- intent: learning_activities
+  examples: |
+    - mujhe easy games dikhaiye
+    - show me easy games
+    - kya mujhe kuch simple games mil sakte hain?
+    - what games can I try?
+
+- intent: growth_garden
+  examples: |
+    - growth garden mein flowers kaise milte hain?
+    - how to get flowers in growth garden?
+    - मेरा growth garden फूल कब देगा?
+
+- intent: physical_activity
+  examples: |
+    - physical activity ke points kaise milenge?
+    - how to get points for physical activities?
+    - क्या physical activities का पॉइंट मिलेगा?
+
+- intent: teacher_dashboard
+  examples: |
+    - teacher dashboard kya hota hai?
+    - what is teacher dashboard?
+    - कैसे teacher mera progress देखते हैं?
+
+- intent: motivation_tips
+  examples: |
+    - my child is not motivated, any tips?
+    - mera beta motivated नहीं है, क्या करना चाहिए?
+    - how to motivate my child?
+
+- intent: out_of_scope
+  examples: |
+    - who won the cricket match?
+    - what is the weather today?
+    - tell me a joke

@@ -1,0 +1,61 @@
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+import uvicorn
+from google.cloud import speech_v1
+from gtts import gTTS
+from rasa_nlu.model import Interpreter
+
+app = FastAPI()
+
+# Load Rasa or Dialogflow model for NLU
+interpreter = Interpreter.load("./models/nlu")
+
+# Define request schema for webhook
+class ChatRequest(BaseModel):
+    message: str
+    language: str  # 'hi' or 'en' or 'hi-en'
+
+# Predefined responses dict
+RESPONSES = {
+    "learning_activities": {
+        "en": "Sure! Here are some easy games you can try.",
+        "hi": "यहाँ कुछ आसान खेल हैं जिन्हें आप आज़मा सकते हैं।"
+    },
+    "growth_garden": {
+        "en": "You get flowers by completing big tasks in your Growth Garden.",
+        "hi": "आपके हार्ड वर्क से फूल खिलते हैं!"
+    },
+    # Add other intent responses...
+}
+
+UNKNOWN_RESPONSE = {
+    "en": "Sorry, I can help only with learning and platform-related queries.",
+    "hi": "माफ़ करना, मैं केवल सीखने और प्लेटफ़ॉर्म से जुड़ी जानकारी में मदद कर सकता हूँ।"
+}
+
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    message = request.message
+    lang = request.language
+
+    # NLU prediction
+    result = interpreter.parse(message)
+    intent = result.get('intent', {}).get('name', '')
+
+    # Determine response
+    if intent in RESPONSES:
+        response_text = RESPONSES[intent].get(lang, RESPONSES[intent]["en"])
+    else:
+        response_text = UNKNOWN_RESPONSE.get(lang, UNKNOWN_RESPONSE["en"])
+
+    # Generate TTS audio
+    tts = gTTS(text=response_text, lang=lang)
+    audio_file = "/tmp/response.mp3"
+    tts.save(audio_file)
+
+    return {
+        "text": response_text,
+        "audio_url": audio_file  # Can be served via another static route
+    }
+
+# Run with: uvicorn main:app --reload

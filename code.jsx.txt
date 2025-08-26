@@ -1,0 +1,78 @@
+import React, { useState, useEffect } from "react";
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+recognition.lang = "hi-IN"; // Hindi + English mix; adjust dynamically if needed
+recognition.continuous = false;
+
+function BuddyChatbot() {
+  const [listening, setListening] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  const startListening = () => {
+    if (!recognition) return alert("Speech Recognition not supported");
+    setListening(true);
+    recognition.start();
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    setInput(transcript);
+    setListening(false);
+    sendMessage(transcript);
+  };
+
+  recognition.onend = () => {
+    setListening(false);
+  };
+
+  const sendMessage = async (msg) => {
+    if (!msg.trim()) return;
+    setMessages((prev) => [...prev, { sender: "user", text: msg }]);
+    
+    // Detect language (naive)
+    let lang = "hi"; 
+    if (/[a-zA-Z]/.test(msg)) lang = "hi-en";  // Hinglish assumed
+    
+    const response = await fetch("http://localhost:8000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg, language: lang }),
+    });
+    const data = await response.json();
+    
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: data.text, audioFile: data.audio_file },
+    ]);
+    
+    const audio = new Audio(`http://localhost:8000/audio/${data.audio_file}`);
+    audio.play();
+  };
+
+  return (
+    <div className="chat-container">
+      <div className="messages">
+        {messages.map((m, i) => (
+          <div key={i} className={m.sender === "user" ? "user-msg" : "bot-msg"}>
+            {m.text}
+          </div>
+        ))}
+      </div>
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Type or speak here..."
+      />
+      <button onClick={() => sendMessage(input)}>Send</button>
+      <button onMouseDown={startListening} disabled={listening}>
+        {listening ? "Listening..." : "Hold to Speak"}
+      </button>
+    </div>
+  );
+}
+
+export default BuddyChatbot;
